@@ -1,0 +1,36 @@
+version: "3.4"
+networks: 
+  fabric: 
+    external: 
+      name: fabric
+services:
+  ca1:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == linuxkit-025000000001
+    image: hyperledger/fabric-ca:latest
+    networks:
+      fabric:
+        aliases:
+        - ca.insurer.example.com
+    environment:
+    - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+    - FABRIC_CA_SERVER_CA_NAME=ca.insurer.example.com
+    - FABRIC_CA_SERVER_TLS_ENABLED=false
+    - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.insurer.example.com-cert.pem
+    - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/37d2608ae2db370012dc303ecb15e7347900f70dca1bc9ace5a84bb6133f8357_sk
+    command: sh -c 'fabric-ca-server start --cfg.identities.allowremove --cfg.affiliations.allowremove --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.insurer.example.com-cert.pem
+      --ca.keyfile /etc/hyperledger/fabric-ca-server-config/37d2608ae2db370012dc303ecb15e7347900f70dca1bc9ace5a84bb6133f8357_sk -b admin:adminpw
+      -d'
+    volumes:
+    - ./crypto-config/peerOrganizations/insurer.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    ports:
+     - published: 7054
+       target: 7054
+       mode: host

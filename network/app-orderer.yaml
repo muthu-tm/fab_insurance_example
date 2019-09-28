@@ -1,0 +1,42 @@
+version: "3.4"
+volumes:
+  orderer.example.com:
+networks: 
+  fabric: 
+    external: 
+      name: fabric
+services: 
+  orderer: 
+    command: orderer
+    deploy: 
+      placement: 
+        constraints: 
+          - "node.hostname == linuxkit-025000000001"
+      replicas: 1
+      restart_policy: 
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    environment: 
+      - ORDERER_GENERAL_LOGLEVEL=DEBUG
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_LOGGING_GRPC=debug
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+    image: "hyperledger/fabric-orderer:latest"
+    networks: 
+      fabric: 
+        aliases: 
+          - orderer.example.com
+    ports:
+      - published: 7050
+        target: 7050
+        mode: host
+    volumes: 
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/:/var/hyperledger/orderer/tls
+      - orderer.example.com:/var/hyperledger/production/orderer
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric

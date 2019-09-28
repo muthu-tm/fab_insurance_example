@@ -1,0 +1,43 @@
+version: "3.4"
+networks: 
+  fabric: 
+    external: 
+      name: fabric
+services:
+  insurercli:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == linuxkit-025000000001
+    image: hyperledger/fabric-tools:latest
+    networks:
+      fabric:
+        aliases:
+        - cli
+    environment:
+    - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+    - GOPATH=/opt/gopath
+    - GOROOT=/opt/go
+    - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+    - CORE_LOGGING_LEVEL=DEBUG
+    - CORE_PEER_ID=cli
+    - CORE_PEER_ADDRESS=peer0.insurer.example.com:7051
+    - CORE_PEER_LOCALMSPID=InsurerMSP
+    - CORE_PEER_TLS_ENABLED=false
+    - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/insurer.example.com/peers/peer0.insurer.example.com/tls/server.crt
+    - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/insurer.example.com/peers/peer0.insurer.example.com/tls/server.key
+    - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/insurer.example.com/peers/peer0.insurer.example.com/tls/ca.crt
+    - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/insurer.example.com/users/Admin@insurer.example.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: sleep 3600
+    volumes:
+    - /var/run/:/host/var/run/
+    - ./fab_insurance_exmaple/chaincode/src:/opt/gopath/src/
+    - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+    - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    - ./fab_insurance_exmaple/chaincode/src/github.com/go/vendor/github.com:/opt/go/src/github.com/

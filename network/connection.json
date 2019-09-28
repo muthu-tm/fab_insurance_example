@@ -1,0 +1,81 @@
+{
+    "name": "Insurance-network",
+    "version": "1.0.0",
+    "client": {
+        "organization": "Insurer",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                },
+                "orderer": "300"
+            }
+        }
+    },
+    "channels": {
+        "insurancechannel": {
+            "orderers": [
+                "orderer.example.com"
+            ],
+            "peers": {
+                "peer0.insurer.example.com": {},
+                "peer0.customer.example.com": {}
+            }
+        }
+    },
+    "organizations": {
+        "Insurer": {
+            "mspid": "InsurerMSP",
+            "peers": [
+                "peer0.insurer.example.com"
+            ],
+            "certificateAuthorities": [
+                "ca.insurer.example.com"
+            ],
+            "adminPrivateKey": {
+                "path": "../../crypto-config/peerOrganizations/insurer.example.com/users/Admin@insurer.example.com/msp/keystore/d4703ee86cf034ba7fee03824801558c9db518be59c9b9c067f14217574a0b6d_sk"
+            },
+            "signedCert": {
+                "path": "../../crypto-config/peerOrganizations/insurer.example.com/users/Admin@insurer.example.com/msp/signcerts/Admin@insurer.example.com-cert.pem"
+            }
+        },
+        "Customer": {
+            "mspid": "CustomerMSP",
+            "peers": [
+                "peer0.customer.example.com"
+            ],
+            "certificateAuthorities": [
+                "ca.insurer.example.com"
+            ],
+            "adminPrivateKey": {
+                "path": "../../crypto-config/peerOrganizations/customer.example.com/users/Admin@customer.example.com/msp/keystore/257ff4d724747fff4621bc0d62da61b4386439dd9686f15dc228a9e242dd14a5_sk"
+            },
+            "signedCert": {
+                "path": "../../crypto-config/peerOrganizations/customer.example.com/users/Admin@customer.example.com/msp/signcerts/Admin@insurer.example.com-cert.pem"
+            }
+        }
+    },
+    "orderers": {
+        "orderer.example.com": {
+            "url": "grpc://localhost:7050"
+        }
+    },
+    "peers": {
+        "peer0.insurer.example.com": {
+            "url": "grpc://localhost:7051"
+        },
+        "peer0.customer.example.com": {
+            "url": "grpc://localhost:8051"
+        }
+    },
+    "certificateAuthorities": {
+        "ca.insurer.example.com": {
+            "url": "http://localhost:7054",
+            "caName": "ca.insurer.example.com",
+            "registrar": {
+                "enrollId": "admin",
+                "enrollSecret": "adminpw"
+            }
+        }
+    }
+}

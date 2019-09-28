@@ -1,0 +1,24 @@
+version: "3.4"
+networks: 
+  fabric: 
+    external: 
+      name: fabric
+services: 
+  couchdb0: 
+    deploy: 
+      placement: 
+        constraints: 
+          - "node.hostname == linuxkit-025000000001"
+      replicas: 1
+      restart_policy: 
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    image: "hyperledger/fabric-couchdb:latest"
+    networks: 
+      fabric: 
+        aliases: 
+          - couchdb0
+    ports: 
+      - 5984:5984	  
+  
