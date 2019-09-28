@@ -1,5 +1,5 @@
 /*
-* An Insurance chaincode for basci insurance transactions between insurer and customer\
+* An Insurance chaincode for basic policy transactions between insurer and customer
  */
 package main
 
@@ -89,8 +89,18 @@ func newPolicy(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) 
 		return nil, err
 	}
 
-	customer := NewCustomerWithPayment(customerID, customerName, insurerID, policyID, appliedDate, expiryDate, policyType,
-		amount, payType, datePaid)
+	existingCustomer, customer, err := IsExistingCustomer(stub, customerID)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingCustomer {
+		policy := NewPolicy(policyID, customerID, customerName, appliedDate, expiryDate, policyType)
+		customer.Policies = append(customer.Policies, policy)
+	} else {
+		customer = NewCustomerWithPayment(customerID, customerName, insurerID, policyID, appliedDate, expiryDate, policyType,
+			amount, payType, datePaid)
+	}
 
 	existingInsurer, insurer, err := IsExistingInsurer(stub, insurerID)
 	if err != nil {
@@ -281,8 +291,8 @@ func getPayments(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 }
 
 func renewPolicy(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	if len(args) != 1 {
-		return nil, fmt.Errorf("Incorrect number of arguments for RENEWPOLICY! Expected 1")
+	if len(args) != 6 {
+		return nil, fmt.Errorf("Incorrect number of arguments for RENEWPOLICY! Expected 6")
 	}
 	customerID := args[0]
 	policyID := args[1]

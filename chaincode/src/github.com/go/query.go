@@ -16,6 +16,7 @@ func PutState(stub shim.ChaincodeStubInterface, key string, value []byte) error 
 	return stub.PutState(key, value)
 }
 
+// checks for existing insurer details
 func IsExistingInsurer(stub shim.ChaincodeStubInterface, key string) (bool, Insurer, error) {
 	bytesData, err := stub.GetState(key)
 	var insurer Insurer
@@ -29,6 +30,22 @@ func IsExistingInsurer(stub shim.ChaincodeStubInterface, key string) (bool, Insu
 	}
 
 	return true, insurer, nil
+}
+
+// checks for existing customer details
+func IsExistingCustomer(stub shim.ChaincodeStubInterface, key string) (bool, Customer, error) {
+	bytesData, err := stub.GetState(key)
+	var customer Customer
+	if err != nil {
+		return false, customer, err
+	}
+
+	err = json.Unmarshal(bytesData, &customer)
+	if err != nil {
+		return false, customer, err
+	}
+
+	return true, customer, nil
 }
 
 func GetInsurerPolicies(stub shim.ChaincodeStubInterface, key string) ([]Policy, error) {
