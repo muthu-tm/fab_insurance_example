@@ -22,10 +22,10 @@ async function invokeChaincode(channelName, chaincodeName, fcn, args, userName) 
 				proposalResponses = await transaction.submit(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
 				break;
 			case constants.TRANSFER_POLICY:
-				proposalResponses = await transaction.submit(args[0], args[1], args[2], args[3]);
+				proposalResponses = await transaction.submit(args[0], args[1]);
 				break;
 			case constants.RENEW_POLICY:
-				proposalResponses = await transaction.submit(args[0], args[1], args[2], args[3], args[4], args[5]);
+				proposalResponses = await transaction.submit(args[0], args[1], args[2], args[3], args[4]);
 				break;
 		}
 

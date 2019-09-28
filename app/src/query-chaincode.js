@@ -19,11 +19,10 @@ async function queryChaincode(channelName, chaincodeName, fcn, args, userName) {
 		var queryResponses;
 		switch (fcn) {
 			case constants.QUERY_POLICY_BY_ID:
-				queryResponses = await transaction.evaluate(args[0], args[1]);
-				break;
 			case constants.QUERY_ALL_POLICIES:
 			case constants.GET_CUSTOMER:
 			case constants.GET_POLICY_PAYMENTS:
+			case constants.QUERY_CUSTOMER_POLICY:
 				queryResponses = await transaction.evaluate(args[0]);
 				break;
 		}

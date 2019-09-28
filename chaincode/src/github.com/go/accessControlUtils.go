@@ -7,6 +7,7 @@ import (
 	cid "github.com/hyperledger/fabric/core/chaincode/shim/ext/cid"
 )
 
+// Attribute Based Access Control (ABAC)
 func assertAttributeValue(stub shim.ChaincodeStubInterface, attrName string, value string) error {
 	_, ok, err := cid.GetAttributeValue(stub, attrName)
 	if err != nil {

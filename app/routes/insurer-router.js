@@ -88,7 +88,6 @@ routes.post('/insurancePolicy', async function (req, res) {
 // Get Insurance policy by unique policyID
 routes.get('/policy', async function (req, res) {
     var userID = req.query.userID,
-        insurerID = req.query.insurerID,
         policyID = req.query.policyID;
 
 
@@ -96,16 +95,12 @@ routes.get('/policy', async function (req, res) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
         return;
     }
-    if (!insurerID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'insurerID'));
-        return;
-    }
     if (!policyID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'policyID'));
         return;
     }
 
-    var args = [insurerID, policyID]
+    var args = [policyID]
     var response = await query.queryChaincode(channelName, chaincodeId,
         constants.QUERY_POLICY_BY_ID, args, userID);
 
@@ -158,21 +153,11 @@ routes.get('/customer', async function (req, res) {
 // Transfer the policy ownership to customer
 routes.put('/transferPolicy', async function (req, res) {
     var userID = req.body.userID,
-    customerID = req.body.customerID,
-    insurerID = req.body.insurerID,
     policyID = req.body.policyID,
     transferOwnership = req.body.transferOwnership;
 
     if (!userID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
-        return;
-    }
-    if (!customerID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'customerID'));
-        return;
-    }
-    if (!insurerID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'insurerID'));
         return;
     }
     if (!policyID) {
@@ -184,7 +169,7 @@ routes.put('/transferPolicy', async function (req, res) {
         return;
     }
 
-    var args = [customerID, insurerID, policyID, transferOwnership.toString()];
+    var args = [policyID, transferOwnership.toString()];
     var response = await invoke.invokeChaincode(channelName, chaincodeId,
         constants.TRANSFER_POLICY, args, userID);
 

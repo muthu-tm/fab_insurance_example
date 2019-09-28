@@ -16,68 +16,18 @@ func PutState(stub shim.ChaincodeStubInterface, key string, value []byte) error 
 	return stub.PutState(key, value)
 }
 
-// checks for existing insurer details
-func IsExistingInsurer(stub shim.ChaincodeStubInterface, key string) (bool, Insurer, error) {
-	bytesData, err := stub.GetState(key)
-	var insurer Insurer
+// IsExistingPolicy - checks whether the policy already exists
+func IsExistingPolicy(stub shim.ChaincodeStubInterface, key string) (bool, error) {
+	// If the key does not exist in the state database, (nil, nil) is returned.
+	byteVal, err := stub.GetState(key)
 	if err != nil {
-		return false, insurer, err
+		return false, err
+	}
+	if byteVal != nil {
+		return true, nil
 	}
 
-	err = json.Unmarshal(bytesData, &insurer)
-	if err != nil {
-		return false, insurer, err
-	}
-
-	return true, insurer, nil
-}
-
-// checks for existing customer details
-func IsExistingCustomer(stub shim.ChaincodeStubInterface, key string) (bool, Customer, error) {
-	bytesData, err := stub.GetState(key)
-	var customer Customer
-	if err != nil {
-		return false, customer, err
-	}
-
-	err = json.Unmarshal(bytesData, &customer)
-	if err != nil {
-		return false, customer, err
-	}
-
-	return true, customer, nil
-}
-
-func GetInsurerPolicies(stub shim.ChaincodeStubInterface, key string) ([]Policy, error) {
-	bytesData, err := stub.GetState(key)
-	var insurer Insurer
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(bytesData, &insurer)
-	if err != nil {
-		return nil, err
-	}
-
-	policies := insurer.Policies
-	return policies, nil
-}
-
-func GetCustomerPolicies(stub shim.ChaincodeStubInterface, key string) ([]Policy, error) {
-	bytesData, err := stub.GetState(key)
-	var customer Customer
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(bytesData, &customer)
-	if err != nil {
-		return nil, err
-	}
-
-	policies := customer.Policies
-	return policies, nil
+	return false, nil
 }
 
 func queryState(stub shim.ChaincodeStubInterface, policyID string) ([]byte, error) {
@@ -89,34 +39,20 @@ func queryState(stub shim.ChaincodeStubInterface, policyID string) ([]byte, erro
 	return bytesData, nil
 }
 
-func getCustomerByID(stub shim.ChaincodeStubInterface, customerID string) (Customer, error) {
-	bytesData, err := getState(stub, customerID)
-	var customer Customer
+// GetPolicyByID - Get the policy and returns the Policy struct after conversion
+func GetPolicyByID(stub shim.ChaincodeStubInterface, policyID string) (Policy, error) {
+	bytesData, err := getState(stub, policyID)
+	var policy Policy
 	if err != nil {
-		return customer, err
+		return policy, err
 	}
 
-	err = json.Unmarshal(bytesData, &customer)
+	err = json.Unmarshal(bytesData, &policy)
 	if err != nil {
-		return customer, err
+		return policy, err
 	}
 
-	return customer, nil
-}
-
-func getInsurerByID(stub shim.ChaincodeStubInterface, insurerID string) (Insurer, error) {
-	bytesData, err := getState(stub, insurerID)
-	var insurer Insurer
-	if err != nil {
-		return insurer, err
-	}
-
-	err = json.Unmarshal(bytesData, &insurer)
-	if err != nil {
-		return insurer, err
-	}
-
-	return insurer, nil
+	return policy, nil
 }
 
 func getState(stub shim.ChaincodeStubInterface, key string) ([]byte, error) {
@@ -128,11 +64,7 @@ func getState(stub shim.ChaincodeStubInterface, key string) ([]byte, error) {
 	return resValue, nil
 }
 
-/***********************************************************
-* getStateByQueryAndDecrypt retrieves the value for the given
-* rich query and decrypts it with the supplied entity and
-* returns the result of the decryption
-***********************************************************/
+// getStateByQueryAndDecrypt retrieves the value for the given rich query
 func getStateByQuery(stub shim.ChaincodeStubInterface, query string) ([]byte, error) {
 
 	log.Println("\n >>  QueryString:- ", query)

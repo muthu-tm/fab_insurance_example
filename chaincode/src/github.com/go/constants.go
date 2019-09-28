@@ -29,3 +29,6 @@ const GETPOLICYPAYMENTS = "getPolicyPayments"
 
 // RENEWPOLICY - renew the insurance policy
 const RENEWPOLICY = "renewPolicy"
+
+// QUERYCUSTOMERPOLICY - get the customer's policy
+const QUERYCUSTOMERPOLICY = "getCustomerPolicy"

@@ -8,33 +8,6 @@ const express = require('express'),
 var channelName = constants.CHANNEL_NAME,
     chaincodeId = constants.CHAINCODE_NAME;
 
-// Get Insurance policy by unique policyID
-routes.get('/policy', async function (req, res) {
-    var userID = req.query.userID,
-        insurerID = req.query.insurerID,
-        policyID = req.query.policyID;
-
-
-    if (!userID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
-        return;
-    }
-    if (!insurerID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'insurerID'));
-        return;
-    }
-    if (!policyID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'policyID'));
-        return;
-    }
-
-    var args = [insurerID, policyID]
-    var response = await query.queryChaincode(channelName, chaincodeId,
-        constants.QUERY_POLICY_BY_ID, args, userID);
-
-    res.status(200).json(response)
-});
-
 // Get all policies for the given customerID
 routes.get('/policies', async function (req, res) {
     var userID = req.query.userID,
@@ -51,7 +24,7 @@ routes.get('/policies', async function (req, res) {
 
     var args = [customerID]
     var response = await query.queryChaincode(channelName, chaincodeId,
-        constants.QUERY_ALL_POLICIES, args, userID);
+        constants.QUERY_CUSTOMER_POLICY, args, userID);
 
     res.status(200).json(response)
 });
@@ -59,18 +32,18 @@ routes.get('/policies', async function (req, res) {
 // Get all payments for the given customerID
 routes.get('/payments', async function (req, res) {
     var userID = req.query.userID,
-    customerID = req.query.customerID;
+    policyID = req.query.policyID;
 
     if (!userID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
         return;
     }
-    if (!customerID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'customerID'));
+    if (!policyID) {
+        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'policyID'));
         return;
     }
 
-    var args = [customerID]
+    var args = [policyID]
     var response = await query.queryChaincode(channelName, chaincodeId,
         constants.GET_POLICY_PAYMENTS, args, userID);
 
@@ -80,7 +53,6 @@ routes.get('/payments', async function (req, res) {
 // Renew the current policy by payment
 routes.post('/renewPolicy', async function (req, res) {
     var userID = req.query.userID,
-    customerID = req.query.customerID,
     policyID = req.query.policyID,
     amountVal = req.query.amountVal,
     payType = req.query.payType,
@@ -89,10 +61,6 @@ routes.post('/renewPolicy', async function (req, res) {
 
     if (!userID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
-        return;
-    }
-    if (!customerID) {
-        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'customerID'));
         return;
     }
     if (!policyID) {
@@ -122,7 +90,7 @@ routes.post('/renewPolicy', async function (req, res) {
         return;
     }
 
-    var args = [customerID, policyID, amountVal.toString(), payType, datePaid, expiryDate]
+    var args = [policyID, amountVal.toString(), payType, datePaid, expiryDate]
     var response = await invoke.invokeChaincode(channelName, chaincodeId,
         constants.RENEW_POLICY, args, userID);
 

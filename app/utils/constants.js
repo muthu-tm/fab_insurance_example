@@ -24,6 +24,8 @@ const TRANSFER_POLICY = "transferPolicy"
 const GET_POLICY_PAYMENTS = "getPolicyPayments"
 // RENEW_POLICY - renew the insurance policy
 const RENEW_POLICY = "renewPolicy"
+// QUERY_CUSTOMER_POLICY - get the customer's policy
+const QUERY_CUSTOMER_POLICY = "getCustomerPolicy"
 
 const NETWORK_CONFIG_FILE= "network/connection.json",
 WALLET_PATH="wallet",
@@ -48,6 +50,7 @@ module.exports = {
     TRANSFER_POLICY,
     GET_POLICY_PAYMENTS,
     RENEW_POLICY,
+    QUERY_CUSTOMER_POLICY,
     NETWORK_CONFIG_FILE,
     WALLET_PATH,
     ORG_ADMINID,
