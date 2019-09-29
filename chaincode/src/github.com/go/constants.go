@@ -32,3 +32,6 @@ const RENEWPOLICY = "renewPolicy"
 
 // QUERYCUSTOMERPOLICY - get the customer's policy
 const QUERYCUSTOMERPOLICY = "getCustomerPolicy"
+
+// QUERYPOLICYHISTORY - Get the history of a policy
+const QUERYPOLICYHISTORY = "getPolicyHistory"

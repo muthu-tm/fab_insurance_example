@@ -26,6 +26,8 @@ const GET_POLICY_PAYMENTS = "getPolicyPayments"
 const RENEW_POLICY = "renewPolicy"
 // QUERY_CUSTOMER_POLICY - get the customer's policy
 const QUERY_CUSTOMER_POLICY = "getCustomerPolicy"
+// QUERY_POLICY_HISTORY - Get the history of a policy
+const QUERY_POLICY_HISTORY = "getPolicyHistory"
 
 const NETWORK_CONFIG_FILE= "network/connection.json",
 WALLET_PATH="wallet",
@@ -51,6 +53,7 @@ module.exports = {
     GET_POLICY_PAYMENTS,
     RENEW_POLICY,
     QUERY_CUSTOMER_POLICY,
+    QUERY_POLICY_HISTORY,
     NETWORK_CONFIG_FILE,
     WALLET_PATH,
     ORG_ADMINID,

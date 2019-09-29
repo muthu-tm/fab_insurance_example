@@ -69,6 +69,8 @@ func getStateByQuery(stub shim.ChaincodeStubInterface, query string) ([]byte, er
 
 	log.Println("\n >>  QueryString:- ", query)
 
+	// GetQueryResult performs a "rich" query against a state database.
+	// It is only supported for state databases that support rich query, e.g.CouchDB.
 	resultsIterator, err := stub.GetQueryResult(query)
 	if err != nil {
 		return nil, err
@@ -95,11 +97,7 @@ func getStateByQuery(stub shim.ChaincodeStubInterface, query string) ([]byte, er
 		buffer.WriteString(queryResponse.Key)
 		buffer.WriteString("\"")
 		buffer.WriteString(", \"Value\":")
-
-		// The retrieved value record is a JSON object, so we write as-is
-		var policy Policy
-		resValue, err := json.Marshal(policy)
-		buffer.WriteString(string(resValue))
+		buffer.WriteString(string(queryResponse.Value))
 		buffer.WriteString("}")
 		bArrayMemberAlreadyWritten = true
 	}

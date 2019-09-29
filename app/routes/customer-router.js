@@ -11,7 +11,7 @@ var channelName = constants.CHANNEL_NAME,
 // Get all policies for the given customerID
 routes.get('/policies', async function (req, res) {
     var userID = req.query.userID,
-    customerID = req.query.customerID;
+        customerID = req.query.customerID;
 
     if (!userID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
@@ -32,7 +32,7 @@ routes.get('/policies', async function (req, res) {
 // Get all payments for the given customerID
 routes.get('/payments', async function (req, res) {
     var userID = req.query.userID,
-    policyID = req.query.policyID;
+        policyID = req.query.policyID;
 
     if (!userID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
@@ -53,11 +53,11 @@ routes.get('/payments', async function (req, res) {
 // Renew the current policy by payment
 routes.post('/renewPolicy', async function (req, res) {
     var userID = req.query.userID,
-    policyID = req.query.policyID,
-    amountVal = req.query.amountVal,
-    payType = req.query.payType,
-    datePaid = req.query.datePaid,
-    expiryDate = req.query.expiryDate;
+        policyID = req.query.policyID,
+        amountVal = req.query.amountVal,
+        payType = req.query.payType,
+        datePaid = req.query.datePaid,
+        expiryDate = req.query.expiryDate;
 
     if (!userID) {
         res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
@@ -93,6 +93,26 @@ routes.post('/renewPolicy', async function (req, res) {
     var args = [policyID, amountVal.toString(), payType, datePaid, expiryDate]
     var response = await invoke.invokeChaincode(channelName, chaincodeId,
         constants.RENEW_POLICY, args, userID);
+
+    res.status(200).json(response)
+});
+
+routes.get('/policyHistory', async function (req, res) {
+    var userID = req.query.userID,
+        policyID = req.query.policyID;
+
+    if (!userID) {
+        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'userID'));
+        return;
+    }
+    if (!policyID) {
+        res.status(200).json(responseMessage.getFieldErrorResponse(1001, 'policyID'));
+        return;
+    }
+
+    var args = [policyID]
+    var response = await query.queryChaincode(channelName, chaincodeId,
+        constants.QUERY_POLICY_HISTORY, args, userID);
 
     res.status(200).json(response)
 });

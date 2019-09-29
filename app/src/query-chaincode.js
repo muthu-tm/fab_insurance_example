@@ -23,6 +23,7 @@ async function queryChaincode(channelName, chaincodeName, fcn, args, userName) {
 			case constants.GET_CUSTOMER:
 			case constants.GET_POLICY_PAYMENTS:
 			case constants.QUERY_CUSTOMER_POLICY:
+			case constants.QUERY_POLICY_HISTORY:
 				queryResponses = await transaction.evaluate(args[0]);
 				break;
 		}

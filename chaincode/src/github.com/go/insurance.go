@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,14 +20,20 @@ type Insurance struct {
 	testMode bool
 }
 
-// Init overridden method - it gets called during chaincode instantiation to initialize any data
+// Init is called during Instantiate transaction after the chaincode container
+// has been established for the first time, allowing the chaincode to
+// initialize its internal data
 func (cc *Insurance) Init(stub shim.ChaincodeStubInterface) peer.Response {
 	return shim.Success(nil)
 }
 
-// Invoke overriddedn method - it gets called per transaction proposal
+// Invoke is called to update or query the ledger in a proposal transaction.
+// Updated state variables are not committed to the ledger until the
+// transaction is committed.
 func (cc *Insurance) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 
+	// GetFunctionAndParameters returns the first argument as the function name
+	// and the rest of the arguments as parameters in a string array.
 	function, args := stub.GetFunctionAndParameters()
 
 	var result []byte
@@ -48,6 +55,8 @@ func (cc *Insurance) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		result, err = renewPolicy(stub, args)
 	} else if function == QUERYCUSTOMERPOLICY {
 		result, err = getCustomerPolicy(stub, args)
+	} else if function == QUERYPOLICYHISTORY {
+		result, err = getPolicyHistory(stub, args)
 	} else if function == "" {
 		err = errors.New("Chaincode invoke function name should not be empty")
 	} else {
@@ -269,6 +278,47 @@ func getCustomerPolicy(stub shim.ChaincodeStubInterface, args []string) ([]byte,
 	query := fmt.Sprintf("{\"selector\" : {\"customer\": { \"customerID\": \"%s\"}}}", customerID)
 
 	return getStateByQuery(stub, query)
+}
+
+func getPolicyHistory(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("Incorrect number of arguments for QUERYPOLICYHISTORY! Expected 1")
+	}
+	policyID := args[0]
+
+	// GetHistoryForKey returns a history of key values across time.
+	resultsIterator, err := stub.GetHistoryForKey(policyID)
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	// buffer is a JSON array containing the retrieved History Records
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+
+	bArrayMemberAlreadyWritten := false
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		// Add a comma before array members, suppress it for the first array member
+		if bArrayMemberAlreadyWritten {
+			buffer.WriteString(",")
+		}
+		buffer.WriteString("{\"Key\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(policyID)
+		buffer.WriteString("\"")
+		buffer.WriteString(", \"Value\":")
+		buffer.WriteString(string(queryResponse.Value))
+		buffer.WriteString("}")
+		bArrayMemberAlreadyWritten = true
+	}
+	buffer.WriteString("]")
+	return buffer.Bytes(), nil
 }
 
 func main() {
